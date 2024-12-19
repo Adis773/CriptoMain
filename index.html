@@ -1,0 +1,289 @@
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CriptoMain</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to bottom, #e0f7fa, #80deea, #00bcd4);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        h1 {
+            margin: 20px 0;
+            font-size: 32px;
+            color: #333;
+        }
+
+        #user-name-display {
+            font-size: 20px;
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        .circle-button {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background-color: #ffc107;
+            border: 4px solid #333;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            font-weight: bold;
+            color: #fff;
+            transition: transform 0.2s ease;
+        }
+
+        .circle-button:active {
+            transform: scale(1.1);
+        }
+
+        #counter {
+            margin-top: 10px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        #timer {
+            font-size: 20px;
+            font-weight: bold;
+            color: red;
+        }
+
+        .bottom-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .rect-button {
+            width: 140px;
+            height: 50px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .rect-button:active {
+            transform: scale(0.95);
+        }
+
+        .screen {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .close-button {
+            background: red;
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        input, select {
+            margin: 10px 0;
+            padding: 10px;
+            font-size: 16px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 80%;
+            margin-top: 20px;
+            color: #fff;
+        }
+
+        table, th, td {
+            border: 1px solid white;
+            text-align: center;
+        }
+
+        th, td {
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="terms-screen">
+        <h1>Условия использования</h1>
+        <div id="terms-text">
+            <p>Добро пожаловать в CriptoMain!</p>
+            <p>Используя наше приложение, вы соглашаетесь с тем, что:</p>
+            <ol>
+                <li>Все заработанные монеты являются виртуальными и не имеют реальной денежной стоимости.</li>
+                <li>Вы обязуетесь вводить только достоверные данные.</li>
+                <li>Администрация приложения не несет ответственности за неправильное использование сервиса.</li>
+            </ol>
+            <p>Если вы не согласны с этими условиями, пожалуйста, не используйте приложение.</p>
+        </div>
+        <button id="accept-terms" class="rect-button">Далее</button>
+    </div>
+
+    <h1>CriptoMain</h1>
+    <div id="user-name-display">Привет, Гость!</div>
+    <div id="mining-button" class="circle-button">₿</div>
+    <div id="counter">0</div>
+    <div id="timer"></div>
+    <div class="bottom-buttons">
+        <button id="card-button" class="rect-button">Карта</button>
+        <button id="settings-button" class="rect-button">Настройки</button>
+        <button id="rating-button" class="rect-button">Рейтинг</button>
+    </div>
+
+    <div id="card-screen" class="screen">
+        <h2>Карта</h2>
+        <p>Введите номер телефона:</p>
+        <input type="tel" id="phone-input" placeholder="Телефон">
+        <button id="register-button" class="rect-button">Зарегистрировать</button>
+        <div id="service-select" style="display: none;">
+            <p>Выберите сервис:</p>
+            <select id="service-dropdown">
+                <option value="Kaspi Gold">Kaspi Gold</option>
+                <option value="Halyk Bank">Halyk Bank</option>
+                <option value="Сбербанк">Сбербанк</option>
+                <option value="Альфа банк">Альфа банк</option>
+                <option value="Visa">Visa</option>
+            </select>
+            <button id="complete-button" class="rect-button">Вывести</button>
+        </div>
+        <button class="close-button" onclick="closeScreen('card-screen')">Назад</button>
+    </div>
+
+    <div id="settings-screen" class="screen">
+        <h2>Настройки</h2>
+        <label for="name-input">Имя:</label>
+        <input type="text" id="name-input" placeholder="Введите имя">
+        <label for="sound-select">Выберите мелодию:</label>
+        <select id="sound-select">
+            <option value="sound1.mp3">Мелодия 1</option>
+            <option value="sound2.mp3">Мелодия 2</option>
+            <option value="sound3.mp3">Мелодия 3</option>
+            <option value="sound4.mp3">Мелодия 4</option>
+            <option value="sound5.mp3">Мелодия 5</option>
+            <option value="sound6.mp3">Мелодия 6</option>
+            <option value="sound7.mp3">Мелодия 7</option>
+            <option value="sound8.mp3">Мелодия 8</option>
+            <option value="sound9.mp3">Мелодия 9</option>
+            <option value="sound10.mp3">Мелодия 10</option>
+        </select>
+        <button id="save-settings" class="rect-button">Сохранить</button>
+        <button class="close-button" onclick="closeScreen('settings-screen')">Назад</button>
+    </div>
+
+    <div id="rating-screen" class="screen">
+        <h2>Рейтинг</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Имя</th>
+                    <th>Баллы</th>
+                </tr>
+            </thead>
+            <tbody id="rating-table">
+                <tr><td>Иван</td><td>50</td></tr>
+                <tr><td>Мария</td><td>40</td></tr>
+                <tr><td>Анна</td><td>30</td></tr>
+                <tr><td>Дмитрий</td><td>25</td></tr>
+                <tr><td>Светлана</td><td>20</td></tr>
+                <tr><td>Максим</td><td>15</td></tr>
+                <tr><td>Ольга</td><td>10</td></tr>
+                <tr><td>Кирилл</td><td>5</td></tr>
+            </tbody>
+        </table>
+        <button class="close-button" onclick="closeScreen('rating-screen')">Назад</button>
+    </div>
+
+    <script>
+        let count = 0;
+        let canClick = true;
+        const audio = new Audio(); // создаем объект для аудио
+
+        // Функция для проигрывания звука
+        function playSound(filename) {
+            audio.src = filename;
+            audio.play();
+        }
+
+        document.getElementById('accept-terms').addEventListener('click', () => {
+            document.getElementById('terms-screen').style.display = 'none';
+        });
+
+        document.getElementById('mining-button').addEventListener('click', () => {
+            if (!canClick) return;
+            canClick = false;
+
+            count++;
+            document.getElementById('counter').textContent = count;
+
+            // Воспроизведение мелодии
+            const selectedSound = document.getElementById('sound-select').value;
+            playSound(selectedSound);
+
+            const timer = document.getElementById('timer');
+            let timeLeft = 2;
+            timer.textContent = `${timeLeft} сек.`;
+            const interval = setInterval(() => {
+                timeLeft -= 1;
+                if (timeLeft <= 0) {
+                    clearInterval(interval);
+                    timer.textContent = '';
+                    canClick = true;
+                } else {
+                    timer.textContent = `${timeLeft} сек.`;
+                }
+            }, 1000);
+        });
+
+        document.getElementById('card-button').addEventListener('click', () => openScreen('card-screen'));
+        document.getElementById('settings-button').addEventListener('click', () => openScreen('settings-screen'));
+        document.getElementById('rating-button').addEventListener('click', () => openScreen('rating-screen'));
+
+        document.getElementById('register-button').addEventListener('click', () => {
+            document.getElementById('service-select').style.display = 'block';
+        });
+
+        document.getElementById('save-settings').addEventListener('click', () => {
+            const name = document.getElementById('name-input').value;
+            if (name) {
+                document.getElementById('user-name-display').textContent = `Привет, ${name}!`;
+                alert(`Настройки сохранены для пользователя ${name}`);
+            } else {
+                alert('Пожалуйста, введите имя.');
+            }
+        });
+
+        function openScreen(screenId) {
+            document.getElementById(screenId).style.display = 'flex';
+        }
+
+        function closeScreen(screenId) {
+            document.getElementById(screenId).style.display = 'none';
+        }
+    </script>
+</body>
+                  </html>
+      
