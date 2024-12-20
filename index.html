@@ -1,23 +1,11 @@
+<!DOCTYPE html>
 <html lang="ru">
 <head>
-    <!-- Yandex.RTB -->
-<script>window.yaContextCb=window.yaContextCb||[]</script>
-<script src="https://yandex.ru/ads/system/context.js" async></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CriptoMain</title>
     <style>
         body {
-            <!-- Yandex.RTB R-A-13404261-1 -->
-<script>
-window.yaContextCb.push(() => {
-    Ya.Context.AdvManager.render({
-        "blockId": "R-A-13404261-1",
-        "type": "fullscreen",
-        "platform": "touch"
-    })
-})
-</script>
             margin: 0;
             font-family: Arial, sans-serif;
             background: linear-gradient(to bottom, #e0f7fa, #80deea, #00bcd4);
@@ -56,7 +44,12 @@ window.yaContextCb.push(() => {
             transition: transform 0.2s ease;
         }
 
-        .circle-button:active {
+        .circle-button.disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .circle-button:active:not(.disabled) {
             transform: scale(1.1);
         }
 
@@ -178,7 +171,7 @@ window.yaContextCb.push(() => {
                 <option value="Kaspi Gold">Kaspi Gold</option>
                 <option value="Halyk Bank">Halyk Bank</option>
                 <option value="Сбербанк">Сбербанк</option>
-                <option value="Альфа банк">Альфа банк</option>
+                <option value="Альфа Банк">Альфа Банк</option>
                 <option value="Visa">Visa</option>
             </select>
             <button id="complete-button" class="rect-button">Вывести</button>
@@ -190,19 +183,6 @@ window.yaContextCb.push(() => {
         <h2>Настройки</h2>
         <label for="name-input">Имя:</label>
         <input type="text" id="name-input" placeholder="Введите имя">
-        <label for="sound-select">Выберите мелодию:</label>
-        <select id="sound-select">
-            <option value="sound1.mp3">Мелодия 1</option>
-            <option value="sound2.mp3">Мелодия 2</option>
-            <option value="sound3.mp3">Мелодия 3</option>
-            <option value="sound4.mp3">Мелодия 4</option>
-            <option value="sound5.mp3">Мелодия 5</option>
-            <option value="sound6.mp3">Мелодия 6</option>
-            <option value="sound7.mp3">Мелодия 7</option>
-            <option value="sound8.mp3">Мелодия 8</option>
-            <option value="sound9.mp3">Мелодия 9</option>
-            <option value="sound10.mp3">Мелодия 10</option>
-        </select>
         <button id="save-settings" class="rect-button">Сохранить</button>
         <button class="close-button" onclick="closeScreen('settings-screen')">Назад</button>
     </div>
@@ -217,14 +197,16 @@ window.yaContextCb.push(() => {
                 </tr>
             </thead>
             <tbody id="rating-table">
-                <tr><td>Иван</td><td>50</td></tr>
-                <tr><td>Мария</td><td>40</td></tr>
-                <tr><td>Анна</td><td>30</td></tr>
-                <tr><td>Дмитрий</td><td>25</td></tr>
-                <tr><td>Светлана</td><td>20</td></tr>
-                <tr><td>Максим</td><td>15</td></tr>
-                <tr><td>Ольга</td><td>10</td></tr>
-                <tr><td>Кирилл</td><td>5</td></tr>
+                <tr><td>Иван</td><td>100</td></tr>
+                <tr><td>Мария</td><td>90</td></tr>
+                <tr><td>Анна</td><td>80</td></tr>
+                <tr><td>Дмитрий</td><td>70</td></tr>
+                <tr><td>Светлана</td><td>60</td></tr>
+                <tr><td>Максим</td><td>50</td></tr>
+                <tr><td>Ольга</td><td>40</td></tr>
+                <tr><td>Кирилл</td><td>30</td></tr>
+                <tr><td>Екатерина</td><td>20</td></tr>
+                <tr><td>Александр</td><td>10</td></tr>
             </tbody>
         </table>
         <button class="close-button" onclick="closeScreen('rating-screen')">Назад</button>
@@ -232,29 +214,40 @@ window.yaContextCb.push(() => {
 
     <script>
         let count = 0;
+        const maxClicks = 100;
         let canClick = true;
-        const audio = new Audio(); // создаем объект для аудио
 
-        // Функция для проигрывания звука
-        function playSound(filename) {
-            audio.src = filename;
-            audio.play();
-        }
+        window.onload = () => {
+            const savedCount = localStorage.getItem('count');
+            const savedName = localStorage.getItem('userName');
+            const termsAccepted = localStorage.getItem('termsAccepted');
 
-        document.getElementById('accept-terms').addEventListener('click', () => {
+            if (savedCount) count = parseInt(savedCount);
+            document.getElementById('counter').textContent = count;
+
+            if (savedName) document.getElementById('user-name-display').textContent = `Привет, ${savedName}!`;
+
+            if (termsAccepted === "true") {
+                document.getElementById('terms-screen').style.display = 'none';
+            }
+        };
+
+        document.getElementById('accept-terms').onclick = () => {
             document.getElementById('terms-screen').style.display = 'none';
-        });
+            localStorage.setItem('termsAccepted', "true");
+        };
 
-        document.getElementById('mining-button').addEventListener('click', () => {
-            if (!canClick) return;
+        document.getElementById('mining-button').onclick = () => {
+            if (!canClick || count >= maxClicks) return;
             canClick = false;
 
             count++;
             document.getElementById('counter').textContent = count;
 
-            // Воспроизведение мелодии
-            const selectedSound = document.getElementById('sound-select').value;
-            playSound(selectedSound);
+            if (count >= maxClicks) {
+                document.getElementById('mining-button').classList
+document.getElementById('mining-button').classList.add('disabled');
+            }
 
             const timer = document.getElementById('timer');
             let timeLeft = 2;
@@ -269,25 +262,34 @@ window.yaContextCb.push(() => {
                     timer.textContent = `${timeLeft} сек.`;
                 }
             }, 1000);
-        });
 
-        document.getElementById('card-button').addEventListener('click', () => openScreen('card-screen'));
-        document.getElementById('settings-button').addEventListener('click', () => openScreen('settings-screen'));
-        document.getElementById('rating-button').addEventListener('click', () => openScreen('rating-screen'));
+            // Сохранение текущего счета
+            localStorage.setItem('count', count);
+        };
 
-        document.getElementById('register-button').addEventListener('click', () => {
+        document.getElementById('card-button').onclick = () => openScreen('card-screen');
+        document.getElementById('settings-button').onclick = () => openScreen('settings-screen');
+        document.getElementById('rating-button').onclick = () => openScreen('rating-screen');
+
+        document.getElementById('register-button').onclick = () => {
             document.getElementById('service-select').style.display = 'block';
-        });
+        };
 
-        document.getElementById('save-settings').addEventListener('click', () => {
+        document.getElementById('complete-button').onclick = () => {
+            const selectedBank = document.getElementById('service-dropdown').value;
+            alert(`Вы выбрали сервис: ${selectedBank}`);
+        };
+
+        document.getElementById('save-settings').onclick = () => {
             const name = document.getElementById('name-input').value;
             if (name) {
                 document.getElementById('user-name-display').textContent = `Привет, ${name}!`;
+                localStorage.setItem('userName', name);
                 alert(`Настройки сохранены для пользователя ${name}`);
             } else {
                 alert('Пожалуйста, введите имя.');
             }
-        });
+        };
 
         function openScreen(screenId) {
             document.getElementById(screenId).style.display = 'flex';
@@ -296,7 +298,11 @@ window.yaContextCb.push(() => {
         function closeScreen(screenId) {
             document.getElementById(screenId).style.display = 'none';
         }
+
+        // Автосохранение каждые 1 секунду
+        setInterval(() => {
+            localStorage.setItem('count', count);
+        }, 1000);
     </script>
 </body>
-                  </html>
-      
+</html>
