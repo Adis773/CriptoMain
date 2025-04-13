@@ -184,6 +184,18 @@ export default function RegistrationForm() {
       "start_button": "开始挖矿",
       "error_message": "请填写所有字段",
       "terms": "注册即表示您同意我们的使用条款和隐私政策"
+    },
+    "kk": {
+      "title": "CriptoMain",
+      "slogan": "Ойна, көр, рақаттан және көп ақша тап",
+      "name_label": "Сіздің атыңыз",
+      "name_placeholder": "Атыңызды енгізіңіз",
+      "phone_label": "Телефон нөмірі",
+      "phone_placeholder": "+7 (707) 123-4567",
+      "language_label": "Тілді таңдаңыз",
+      "start_button": "Майнинг бастау",
+      "error_message": "Барлық өрістерді толтырыңыз",
+      "terms": "Тіркелу арқылы сіз біздің Қолдану шарттары мен Құпиялылық саясатымен келісесіз"
     }
   };
 

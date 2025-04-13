@@ -26,7 +26,7 @@ export default function MainGameScreen() {
               <span className="text-xl">C</span>
             </div>
             <h1 className="text-xl font-['Orbitron'] font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400">
-              CryptoMiner
+              CriptoMain
             </h1>
           </div>
           
@@ -57,10 +57,18 @@ export default function MainGameScreen() {
       </header>
 
       <main className="container mx-auto px-4 py-6 space-y-6">
-        <MiningSection />
-        <VideoSection />
-        <LeaderboardSection />
-        <ReferralSection />
+        <div id="mining">
+          <MiningSection />
+        </div>
+        <div id="videos">
+          <VideoSection />
+        </div>
+        <div id="leaderboard">
+          <LeaderboardSection />
+        </div>
+        <div id="referrals">
+          <ReferralSection />
+        </div>
       </main>
       
       <BottomNav />
