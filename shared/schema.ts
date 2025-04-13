@@ -6,6 +6,7 @@ export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   username: text("username").notNull(),
   phone: text("phone").notNull(),
+  password: text("password").notNull(),
   password: text("password").notNull(),  // Добавлено для авторизации
   email: text("email"),  // Опциональный email
   balance: numeric("balance", { precision: 10, scale: 2 }).notNull().default("0"),
