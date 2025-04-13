@@ -1,4 +1,6 @@
 import { users, adminProfit, type User, type InsertUser } from "@shared/schema";
+import { db } from "./db";
+import { eq } from "drizzle-orm";
 
 // Interface for the storage
 export interface IStorage {
@@ -13,97 +15,108 @@ export interface IStorage {
   getAdminProfit(): Promise<number>;
 }
 
-// In-memory storage implementation
-export class MemStorage implements IStorage {
-  private users: Map<number, User>;
-  private admin: { total: number };
-  private currentId: number;
-
-  constructor() {
-    this.users = new Map();
-    this.admin = { total: 0 };
-    this.currentId = 1;
-  }
-
+// Database storage implementation
+export class DatabaseStorage implements IStorage {
   async getUser(id: number): Promise<User | undefined> {
-    return this.users.get(id);
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username
-    );
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user;
   }
 
   async getUserByReferralId(referralId: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.referralId === referralId
-    );
+    const [user] = await db.select().from(users).where(eq(users.referralId, referralId));
+    return user;
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const id = this.currentId++;
     const today = new Date().toDateString();
-    
-    const user: User = {
-      id,
-      username: insertUser.username,
-      phone: insertUser.phone,
-      balance: "0",
-      clicks: 0,
+    const [user] = await db.insert(users).values({
+      ...insertUser,
       lastResetDate: today,
-      referrals: 0,
-      referralId: insertUser.referralId,
-      theme: "light"
-    };
+      language: insertUser.language || "ru"
+    }).returning();
     
-    this.users.set(id, user);
     return user;
   }
 
   async getAllUsers(): Promise<User[]> {
-    return Array.from(this.users.values());
+    return await db.select().from(users);
   }
 
   async updateUserMining(id: number, clicks: number, earning: number): Promise<User> {
-    const user = this.users.get(id);
+    const [user] = await db.select().from(users).where(eq(users.id, id));
     if (!user) throw new Error("User not found");
     
     const today = new Date().toDateString();
     
+    // Update user with new values
+    let newClicks = clicks;
+    let newLastResetDate = user.lastResetDate;
+    
     // Reset clicks if it's a new day
     if (user.lastResetDate !== today) {
-      user.clicks = clicks;
-      user.lastResetDate = today;
-    } else {
-      user.clicks = clicks;
+      newClicks = clicks;
+      newLastResetDate = today;
     }
     
-    // Update balance
+    // Calculate new balance
     const currentBalance = parseFloat(user.balance);
-    user.balance = (currentBalance + earning).toFixed(2);
+    const newBalance = (currentBalance + earning).toFixed(2);
     
-    this.users.set(id, user);
-    return user;
+    // Update user in database
+    const [updatedUser] = await db.update(users)
+      .set({
+        clicks: newClicks,
+        lastResetDate: newLastResetDate,
+        balance: newBalance
+      })
+      .where(eq(users.id, id))
+      .returning();
+      
+    return updatedUser;
   }
 
   async incrementReferrals(id: number): Promise<User> {
-    const user = this.users.get(id);
+    const [user] = await db.select().from(users).where(eq(users.id, id));
     if (!user) throw new Error("User not found");
     
-    user.referrals += 1;
-    this.users.set(id, user);
-    
-    return user;
+    const [updatedUser] = await db.update(users)
+      .set({
+        referrals: user.referrals + 1
+      })
+      .where(eq(users.id, id))
+      .returning();
+      
+    return updatedUser;
   }
 
   async updateAdminProfit(amount: number): Promise<void> {
-    this.admin.total += amount;
+    const [adminRow] = await db.select().from(adminProfit);
+    
+    if (adminRow) {
+      const currentTotal = parseFloat(adminRow.total);
+      const newTotal = (currentTotal + amount).toFixed(2);
+      
+      await db.update(adminProfit)
+        .set({ total: newTotal })
+        .where(eq(adminProfit.id, adminRow.id));
+    } else {
+      // Create initial admin profit record if it doesn't exist
+      await db.insert(adminProfit).values({
+        total: amount.toFixed(2)
+      });
+    }
   }
 
   async getAdminProfit(): Promise<number> {
-    return this.admin.total;
+    const [adminRow] = await db.select().from(adminProfit);
+    return adminRow ? parseFloat(adminRow.total) : 0;
   }
 }
 
-export const storage = new MemStorage();
+// Export instance of storage
+export const storage = new DatabaseStorage();

@@ -12,12 +12,14 @@ export const users = pgTable("users", {
   referrals: integer("referrals").notNull().default(0),
   referralId: text("referral_id").notNull().unique(),
   theme: text("theme").notNull().default("light"),
+  language: text("language").notNull().default("ru"),
 });
 
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
   phone: true,
   referralId: true,
+  language: true,
 });
 
 export const adminProfit = pgTable("admin_profit", {
