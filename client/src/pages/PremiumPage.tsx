@@ -543,11 +543,17 @@ export default function PremiumPage() {
               Отмена
             </Button>
             <Button 
-              disabled={!selectedPaymentMethod} 
+              disabled={!selectedPaymentMethod || isLoading} 
               onClick={() => activatePremium()}
-              isLoading={isLoading}
             >
-              Продолжить
+              {isLoading ? (
+                <div className="flex items-center">
+                  <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-t-transparent" />
+                  <span>Загрузка...</span>
+                </div>
+              ) : (
+                "Продолжить"
+              )}
             </Button>
           </CardFooter>
         </Card>
@@ -607,9 +613,16 @@ export default function PremiumPage() {
           </Button>
           <Button 
             onClick={confirmPayment}
-            isLoading={isLoading}
+            disabled={isLoading}
           >
-            Подтвердить оплату
+            {isLoading ? (
+              <div className="flex items-center">
+                <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-t-transparent" />
+                <span>Проверка...</span>
+              </div>
+            ) : (
+              "Подтвердить оплату"
+            )}
           </Button>
         </CardFooter>
       </Card>
