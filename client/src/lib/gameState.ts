@@ -14,6 +14,7 @@ export interface UserState {
   referrals: number;
   referralId: string;
   theme: Theme;
+  language: string;
 }
 
 export interface AdminProfit {
@@ -35,7 +36,7 @@ export interface GameStateContextType {
   leaderboard: LeaderboardEntry[];
   toastMessage: string | null;
   setToastMessage: (message: string | null) => void;
-  register: (name: string, phone: string) => void;
+  register: (name: string, phone: string, language?: string) => void;
   mine: () => void;
   withdraw: () => void;
   toggleTheme: () => void;
@@ -57,6 +58,7 @@ const initialUserState: UserState = {
   referrals: 0,
   referralId: generateReferralId(),
   theme: "light",
+  language: "ru",
 };
 
 const initialAdminProfit: AdminProfit = {
@@ -105,7 +107,12 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
         storedUser.lastResetDate = today;
       }
       
-      setUser(storedUser);
+      // Ensure language is set (for backward compatibility)
+      if (!storedUser.language) {
+        storedUser.language = "ru";
+      }
+      
+      setUser(storedUser as UserState);
       setAdminProfit(storedAdmin);
     }
     
@@ -139,7 +146,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
   const isRegistered = Boolean(user.name && user.phone);
 
   // Register new user
-  const register = (name: string, phone: string) => {
+  const register = (name: string, phone: string, language?: string) => {
     // Get referrer from localStorage if it exists
     const referrer = localStorage.getItem('cryptoMinerReferrer');
     
@@ -147,6 +154,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
       ...user,
       name,
       phone,
+      language: language || 'ru',
       lastResetDate: new Date().toDateString()
     });
     
@@ -156,7 +164,17 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
     }
     
     updateLeaderboard();
-    setToastMessage(`Welcome, ${name}!`);
+    // Приветствие в зависимости от языка
+    const welcomeMessage = language === 'en' ? `Welcome, ${name}!` : 
+                          language === 'es' ? `¡Bienvenido, ${name}!` : 
+                          language === 'de' ? `Willkommen, ${name}!` : 
+                          language === 'fr' ? `Bienvenue, ${name}!` : 
+                          language === 'it' ? `Benvenuto, ${name}!` : 
+                          language === 'zh' ? `欢迎, ${name}!` : 
+                          language === 'ja' ? `ようこそ, ${name}!` : 
+                          `Добро пожаловать, ${name}!`;
+    
+    setToastMessage(welcomeMessage);
   };
 
   // Mining function
