@@ -8,6 +8,8 @@ export type Theme = "light" | "dark";
 export interface UserState {
   name: string;
   phone: string;
+  password?: string;  // Только для создания, не хранится в состоянии
+  email?: string;
   balance: number;
   clicks: number;
   lastResetDate: string | null;
@@ -15,6 +17,16 @@ export interface UserState {
   referralId: string;
   theme: Theme;
   language: string;
+  
+  // Премиум-параметры
+  isPremium: boolean;
+  premiumExpiry?: string;
+  lastPaymentAmount?: number;
+  miningMultiplier: number;  // Множитель для майнинга
+  dailyClicks: number;       // Количество доступных кликов в день
+  
+  // Скины
+  selectedSkin?: string;     // ID выбранного скина
 }
 
 export interface AdminProfit {
@@ -59,6 +71,14 @@ const initialUserState: UserState = {
   referralId: generateReferralId(),
   theme: "light",
   language: "ru",
+  
+  // Премиум параметры
+  isPremium: false,
+  miningMultiplier: 1.0,
+  dailyClicks: 100,
+  
+  // Скины
+  selectedSkin: "default",
 };
 
 const initialAdminProfit: AdminProfit = {
@@ -179,23 +199,35 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
 
   // Mining function
   const mine = () => {
-    if (cooldownActive || user.clicks >= 100) {
+    // Проверяем, не в режиме ли кулдауна и не превышен ли лимит кликов
+    if (cooldownActive || user.clicks >= user.dailyClicks) {
       return;
     }
 
     setCooldownActive(true);
     setIsMining(true);
 
-    // Calculate earnings for this click
+    // Рассчитываем заработок за этот клик с учетом премиум-статуса
     const baseEarning = parseFloat((Math.random() * 0.6).toFixed(2));
-    const multiplier = 1 + (user.referrals * 0.05);
-    const earning = baseEarning * multiplier;
+    
+    // Множитель с учетом рефералов (5% для обычных пользователей, 10% для премиум)
+    const referralBonus = user.isPremium ? 0.1 : 0.05;
+    const referralMultiplier = 1 + (user.referrals * referralBonus);
+    
+    // Применяем премиум-множитель (если есть)
+    const premiumMultiplier = user.miningMultiplier || 1.0;
+    
+    // Применяем множитель скина (если есть)
+    const skinMultiplier = 1.0; // Здесь должна быть логика скинов
+    
+    // Итоговый заработок
+    const earning = baseEarning * referralMultiplier * premiumMultiplier * skinMultiplier;
 
-    // Update user balance and admin profit
+    // Обновляем баланс пользователя и прибыль администратора
     const newBalance = user.balance + earning;
-    const newAdminProfitTotal = adminProfit.total + (earning * 0.4); // Admin gets 40%
+    const newAdminProfitTotal = adminProfit.total + (earning * 0.4); // Админ получает 40%
 
-    // Update state
+    // Обновляем состояние
     setUser({
       ...user,
       clicks: user.clicks + 1,
@@ -207,7 +239,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
       total: parseFloat(newAdminProfitTotal.toFixed(2))
     });
 
-    // Set cooldown timer
+    // Устанавливаем таймер кулдауна (2 секунды)
     setTimeout(() => {
       setIsMining(false);
       setTimeout(() => {
