@@ -1,3 +1,4 @@
+
 import { Switch, Route } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -14,11 +15,11 @@ import { ProtectedRoute } from "@/lib/protected-route";
 function Router() {
   return (
     <Switch>
-      <ProtectedRoute path="/" component={Home} />
+      <Route path="/" component={Home} />
       <Route path="/auth" component={AuthPage} />
-      <ProtectedRoute path="/premium" component={PremiumPage} />
-      <ProtectedRoute path="/skins" component={SkinsPage} />
-      <Route component={NotFound} />
+      <Route path="/premium" component={PremiumPage} />
+      <Route path="/skins" component={SkinsPage} />
+      <Route path="/:rest*" component={NotFound} />
     </Switch>
   );
 }
