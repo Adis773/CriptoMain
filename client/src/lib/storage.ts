@@ -8,6 +8,7 @@ interface UserState {
   referrals: number;
   referralId: string;
   theme: "light" | "dark";
+  language: string;
 }
 
 interface AdminProfit {
@@ -28,7 +29,8 @@ const initialUser: UserState = {
   lastResetDate: null,
   referrals: 0,
   referralId: Math.random().toString(36).substring(2, 8),
-  theme: "light"
+  theme: "light",
+  language: "ru"
 };
 
 const initialAdminProfit: AdminProfit = {
